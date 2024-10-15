@@ -1,7 +1,2 @@
-tasks = []
-
-def add_task(task):
-    tasks.append(task)
-
-def mostra_tasks():
-    return tasks
+def validacao(nome, senha):
+    return nome == 'igor' and senha == 'ifsp1234'
