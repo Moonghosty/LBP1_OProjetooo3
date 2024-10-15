@@ -1,15 +1,20 @@
 from flask import Blueprint, render_template, request, redirect, url_for
-from models.model import add_task, mostra_tasks
+from models.model import validacao
 
-taskControler = Blueprint('taskController', __name__)
+loginController = Blueprint('loginController', __name__)
 
-@taskControler.route("/")
-def hello_world():
+@loginController.route("/", methods=['GET','POST'])
+def login():
+    if request.method == 'POST':
+        nome = request.form['nome']
+        senha = request.form['senha']
+        if validacao(nome, senha):
+            return redirect(url_for('loginController.dashboard'))
+        else:
+            error = 'Credências Erradas'
+            return render_template("index.html", error=error)
     return render_template("index.html")
 
-@taskControler.route('/add', methods=['POST'])
-def add():
-    task = request.form.get('task')
-    if task:
-        add_task(task)
-    return redirect(url_for('taskController.index'))
+@loginController.route("/dashboard")
+def dashboard():
+    return render_template("dashboard.html")
