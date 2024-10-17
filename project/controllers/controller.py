@@ -13,7 +13,7 @@ def login():
             session['senha'] =senha
             return redirect(url_for('loginController.dashboard'))
         else:
-            error = 'CredÃªncias Erradas'
+            error = 'Credências Erradas'
             return render_template("index.html", error=error)
     return render_template("index.html")
 
