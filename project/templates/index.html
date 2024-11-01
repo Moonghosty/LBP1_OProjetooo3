@@ -3,24 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Página Inicial</title>
 </head>
 <body>
-    <b>LOGIN</b>
-    <br>
-    <form method="POST">
-        <label for="nome">Usuário: </label>
-        <br>
-        <input type="text" name="nome" id="nome">
-        <br>
-        <label for="senha">Senha: </label>
-        <br>
-        <input type="password" id="senha"name="senha">
-        <br>
-        <button type="submit">Confimar</button>
-    </form>
-    {% if error %}
-        {{error}}
-    {% endif %}
+    <div class="container">
+        <h2>Página Inicial</h2>
+        {% if session.get("iduser") %}
+            <a href="{{ url_for('login.logout') }}"><button type="button">Logout</button></a>
+        {% else %}
+            <a href="{{ url_for('login.login') }}"><button type="button">Login</button></a>
+        {% endif %}
+    </div>
 </body>
 </html>
