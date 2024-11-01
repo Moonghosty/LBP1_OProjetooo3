@@ -1,54 +1,74 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash, abort
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash, abort, make_response
 from models.usuario import lista_usuarios
 
 loginController = Blueprint('login', __name__)
 
 @loginController.route("/")
 def inicial():
-    return render_template("incial.html")
+    return render_template("index.html")
 
-@loginController.route("/login", methods=['GET, POST'])
-def login ():
+@loginController.route("/login", methods=['GET', 'POST'])
+def login():
     if request.method == 'POST':
-        nome = request.form['nome'] #usa o 'name' do input pra pegar a informação do formulario
+        nome = request.form.get('nome') #usa o 'name' do input pra pegar a informação do formulario
         senha = request.form.get('senha')
         for usuario in lista_usuarios:
             if usuario.nome == nome and usuario.senha == senha: #criar a session quando o usuario acertar o login, depois da validação
-                session['user']= usuario.nome #não armazenar dados sensiveis como senha na sessão.
                 session['iduser']= usuario.id
                 return redirect(url_for('login.dashboard'))
-        flash("credenciais erradas")     
-        print( 'Login Inválido')    
-        return redirect(url_for('login.login') ) #login(nome da blueprint).login (nome da função)
+        flash("credenciais invalidas", 'error')     
+        flash("tente novamente", 'info')   
     return render_template("login.html")
 
-@loginController.route("/dashboard")
-def dashboard():
-        return render_template("dashboard.html")
+rotas_publicas = ["login.login", "login.index"]
 
-@loginController.route("/logout")
-def logout():
-    session.pop('iduser',None) #pop transforma o elemento em none, nada.
-    session.pop('user', None)
-    return redirect(url_for('login.inicial'))
-
-@loginController.route("/adm")
-def admin():
-    if session.get['iduser'] != 1:
-        abort(401)
-    return "<pagina de adm> "
-    
-
-@loginController.before_request
-def verificalogin(): 
-    if request.endpoint =='login.login' and 'iduser' in session: #verificar primeiro se o usuario está logado 
+@loginController.before_request #middleware (hooks)
+def verificaLogin(): #pergunta se o usuario está logado (para não "gastar" processamento)
+    print(1)
+    if request.endpoint=='login.login' and 'idUser' in session:
         return redirect(url_for('login.index'))
-    
-    if request.endpoint in rotas_publicas: #endpoint retorna a url_for da função/// verificar depois se a rota é publica e pode ser acessada msm sem login
-        return
-    
-    if 'iduser' not in session:
+    print(2)
+    if request.endpoint in rotas_publicas:
+        return 
+    print(3)
+    if "idUser" not in session: #verifica se o user ta na sessão
         return redirect(url_for('login.login'))
+    print(4)
     return
 
-rotas_publicas=['login.login', 'login.inicial']
+@loginController.route('/dashboard')
+def dashboard():
+        return render_template('dash.html')  
+
+@loginController.route('/logout')
+def logout():
+    response=make_response(redirect(url_for("login.index")))
+    session.pop("iduser", None) 
+    response.set_cookie('nome', '', expires=0)
+    response.set_cookie('senha', '', expires=0)
+    return response
+
+@loginController.route("/admin")
+def admin():
+    if session.get("iduser") != 1:
+        abort(401)
+    return render_template('admin.html')
+
+@loginController.route("/cookie")   
+def cookies():
+    if request.method == 'POST':
+        nome = request.form['nome']
+        senha = request.form['senha']
+        response=make_response(render_template('fim.html')) #cia os cookies
+        if nome == lista_usuarios:
+            response.set_cookie('nome', 'Correto', max_age=60 * 60 *24)
+        else:
+            response.set_cookie('nome', 'Incorreto', max_age=60 * 60 *24)
+
+        if senha == lista_usuarios:
+            response.set_cookie('senha', 'Correto', max_age=60 * 60 *24)
+        else: 
+            response.set_cookie('senha', 'Incorreto', max_age=60 * 60 *24)
+        return response
+    return render_template('login.html')
+
