@@ -23,7 +23,7 @@ def login():
 rotas_publicas = ["login.login", "login.index"]
 
 @loginController.before_request #middleware (hooks)
-def verificaLogin(): #pergunta se o usuario está logado (para não "gastar" processamento)
+def verificaLogin():
     print(1)
     if request.endpoint=='login.login' and 'iduser' in session:
         return redirect(url_for('login.index'))
@@ -59,7 +59,7 @@ def cookies():
     if request.method == 'POST':
         nome = request.form['nome']
         senha = request.form['senha']
-        response=make_response(render_template('fim.html')) #cia os cookies
+        response=make_response(render_template('fim.html')) 
         if nome == lista_usuarios:
             response.set_cookie('nome', 'Correto', max_age=60 * 60 *24)
         else:
