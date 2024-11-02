@@ -5,7 +5,7 @@ class Usuario:
         self.senha = senha
 
 lista_usuarios=[]
-user= Usuario(1, "igor", "1234")
-admin= Usuario(2, "admin", "admin")
+user= Usuario(2, "igor", "1234")
+admin= Usuario(1, "admin", "admin")
 lista_usuarios.append(user)
 lista_usuarios.append(admin)
