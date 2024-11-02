@@ -25,13 +25,13 @@ rotas_publicas = ["login.login", "login.index"]
 @loginController.before_request #middleware (hooks)
 def verificaLogin(): #pergunta se o usuario está logado (para não "gastar" processamento)
     print(1)
-    if request.endpoint=='login.login' and 'idUser' in session:
+    if request.endpoint=='login.login' and 'iduser' in session:
         return redirect(url_for('login.index'))
     print(2)
     if request.endpoint in rotas_publicas:
         return 
     print(3)
-    if "idUser" not in session: #verifica se o user ta na sessão
+    if "iduser" not in session: #verifica se o user ta na sessão
         return redirect(url_for('login.login'))
     print(4)
     return
@@ -42,7 +42,7 @@ def dashboard():
 
 @loginController.route('/logout')
 def logout():
-    response=make_response(redirect(url_for("login.index")))
+    response=make_response(redirect(url_for("login.login")))
     session.pop("iduser", None) 
     response.set_cookie('nome', '', expires=0)
     response.set_cookie('senha', '', expires=0)
